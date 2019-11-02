@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # should read / take in configuration and be able to spit out profile list for JupyterHub
 # and configuration files for eksctl
