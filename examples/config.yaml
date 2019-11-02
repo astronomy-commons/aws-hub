@@ -1,0 +1,75 @@
+# configurations for this script
+config:
+  region: "us-west-2"
+  availabilityZones: ["a", "b", "c", "d"]
+  clusterName: "dirac"
+# defaults for the nodegroup YAML
+nodegroupDefaults:
+  name: "{instance_name}-{region}{availability_zones_short}"
+  desiredCapacity: 0
+  minSize: 0
+  maxSize: 100
+  iam:
+    withAddonPolicies:
+      autoScaler: true
+  ssh:
+    allow: true
+    publicKeyName: eks-nodes-access
+  ami: ami-05d586e6f773f6abf
+  labels: 
+    dirac.washington.edu/instance-name: "{instance_name}"
+  tags:
+    k8s.io/cluster-autoscaler/node-template/label/dirac.washington.edu/instance-name: "{instance_name}"
+# Descriptions of the nodegroups we want to make
+groups:
+- families:
+  - "p3"
+  - "p2"
+  - "g4dn"
+  - "g3"
+  - "g4dn"
+  type: "onDemand"
+  separateAvailabilityZones: true
+  separateInstances: true
+  separateFamilies: true
+  nodegroupOverrides:
+    ami: ami-0ca5998dc2c88e64b
+- families:
+  # general purpose
+  - "t3"
+  - "t3a"
+  - "t2"
+  - "m5"
+  - "m5a"
+  - "m5n"
+  - "m4"
+  # compute optimized
+  - "c5"
+  - "c5n"
+  - "c4"
+  # memory optimized
+  - "r5"
+  - "r5a"
+  - "r5n"
+  - "r4"
+  - "x1e"
+  - "x1"
+  - "z1d"
+  # storage optimized
+  - "i3"
+  - "i3en"
+  - "d2"
+  - "h1"
+  type: "onDemand"
+  separateAvailabilityZones: true
+  separateInstances: true
+  separateFamilies: true
+hubDefaults:
+  kubespawner_override:
+    node_affinity_required:
+    - matchExpressions:
+      - key: "dirac.washington.edu/instance-name"
+        operator: "In"
+        values:
+        - "{instance_name}"
+  

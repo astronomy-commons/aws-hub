@@ -1,0 +1,111 @@
+spawn-html: |
+  <script>
+  // Editing worked!
+  // Twice!!
+  // JupyterHub 0.8 applied form-control indisciminately to all form elements.
+  // Can be removed once we stop supporting JupyterHub 0.8
+  $(document).ready(function() {
+    $('#kubespawner-profiles-list input[type="radio"]').removeClass('form-control');
+    $('.nav-tabs li:last-child a').on('click', function (e) {
+      e.preventDefault()
+      $(this).tab('show')
+    });
+  });
+  </script>
+  <style>
+  /* The contents of the label should not be bold, even though it is inside the <label> tag */
+  #kubespawner-profiles-list label{
+      font-weight: normal;
+  }
+  </style>
+  <div class='form-group' id='kubespawner-profiles-list'>
+    {% for profile in profile_list %}
+      {% set x=profile.__setitem__("index", loop.index0) %}
+    {% endfor %}
+    {% for category, profiles_by_category in profile_list | groupby('category') %}
+    <div class="row">
+      <h4>{{ category }}</h4>
+    </div>
+    <br>
+    <ul class="nav nav-tabs" role="tablist">
+      {% for family, profiles in profiles_by_category | groupby('family') %}
+      <li class="nav-item{% if loop.index0 == 0 %} active{% endif %}">
+        <a class="nav-link{% if loop.index0 == 0 %} active{% endif %}" id="{{ family }}-tab" data-toggle="tab" href="#{{ family }}" role="tab" aria-controls="{{ family }}" aria-selected="true">{{ family }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+    <div class="tab-content">
+      {% for family, profiles in profiles_by_category | groupby('family') %}
+      <div class="tab-pane{% if loop.index0 == 0 %} active{% endif %}" id="{{ family }}" role="tabpanel" aria-labelledby="{{ family }}-tab">
+        <div class='col-md-1'>
+        </div>
+        <div class='col-md-1'>
+          <strong>Size</strong>
+        </div>
+        <div class='col-md-1'>
+          <strong>CPU</strong>
+        </div>
+        <div class='col-md-2'>
+          <strong>Memory</strong>
+        </div>
+        <div class='col-md-2'>
+          <strong>Price</strong>
+        </div>
+        <div class='col-md-3'>
+          <strong>Network</strong>
+        </div>
+        <div class='col-md-2'>
+          <strong>Extra Hardware</strong>
+        </div>
+        {% for profile in profiles | sort(attribute='aws.price') %}
+        <label for='profile-item-{{ profile.index }}' class='form-control input-group'>
+          <div class='col-md-1'>
+            <input type='radio' name='profile' id='profile-item-{{ profile.index }}' value='{{ profile.index }}' {% if profile.default %}checked{% endif %} />
+          </div>
+          <div class='col-md-1'>
+            {{ profile.aws.instance_size }}
+          </div>
+          <div class='col-md-1'>
+            {{ profile.aws.cpu }}
+          </div>
+          <div class='col-md-2'>
+            {{ profile.aws.memory }}
+          </div>
+          <div class='col-md-2'>
+            {{ profile.aws.price_description }}
+          </div>
+          <div class='col-md-3'>
+            {{ profile.aws.network }}
+          </div>
+          <div class='col-md-2'>
+            {% if profile.aws.gpu and ('EBS' not in profile.aws.storage) %}
+              {{ profile.aws.gpu }} GPUs and {{ profile.aws.storage }}
+            {% elif profile.aws.gpu %}
+              {{ profile.aws.gpu }} GPUs
+            {% elif 'EBS' not in profile.aws.storage %}
+              {{ profile.aws.storage }}
+            {% endif %}
+          </div>
+        </label>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+    <br>
+    {% endfor %}
+  </div>
+
+jupyterhub:
+  hub:
+    # mount a config map into the Hub pod that contains the HTML to use for spawn
+    extraVolumes:
+    - name: "hub-spawn-html-volume"
+      configMap:
+        name: "hub-spawn-html-config-map"
+    extraVolumeMounts:
+    - name: "hub-spawn-html-volume"
+      mountPath: "/etc/hub-spawn-html"
+    # set the spawn template from the mounted config-map
+    extraConfig:
+      spawn-html:
+        c.KubeSpawner.profile_form_template = open("/etc/hub-spawn-html/spawn.html").read()

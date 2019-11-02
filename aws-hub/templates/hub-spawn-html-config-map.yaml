@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hub-spawn-html-config-map
+data:
+  spawn.html: |-
+{{ index .Values "spawn-html" | indent 4 }}
