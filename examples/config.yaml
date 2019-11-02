@@ -23,18 +23,6 @@ nodegroupDefaults:
 # Descriptions of the nodegroups we want to make
 groups:
 - families:
-  - "p3"
-  - "p2"
-  - "g4dn"
-  - "g3"
-  - "g4dn"
-  type: "onDemand"
-  separateAvailabilityZones: true
-  separateInstances: true
-  separateFamilies: true
-  nodegroupOverrides:
-    ami: ami-0ca5998dc2c88e64b
-- families:
   # general purpose
   - "t3"
   - "t3a"
@@ -64,6 +52,63 @@ groups:
   separateAvailabilityZones: true
   separateInstances: true
   separateFamilies: true
+# create spot instances as well
+- families:
+  # general purpose
+  - "t3"
+  - "t3a"
+  - "m5"
+  - "m5a"
+  - "m5n"
+  - "m4"
+  # compute optimized
+  - "c5"
+  - "c5n"
+  - "c4"
+  # memory optimized
+  - "r5"
+  - "r5a"
+  - "r5n"
+  - "r4"
+  - "x1e"
+  - "x1"
+  - "z1d"
+  # storage optimized
+  - "i3"
+  - "i3en"
+  - "d2"
+  - "h1"
+  type: "spot"
+  separateAvailabilityZones: true
+  separateInstances: true
+  separateFamilies: true
+# GPU nodes require a different AMI
+- families:
+  - "p3"
+  - "p2"
+  - "g4dn"
+  - "g3"
+  - "g4dn"
+  type: "onDemand"
+  separateAvailabilityZones: true
+  separateInstances: true
+  separateFamilies: true
+  nodegroupOverrides:
+    ami: ami-0ca5998dc2c88e64b
+# create Spot instances as well
+- families:
+  - "p3"
+  - "p2"
+  - "g4dn"
+  - "g3"
+  - "g4dn"
+  type: "spot"
+  separateAvailabilityZones: true
+  separateInstances: true
+  separateFamilies: true
+  nodegroupOverrides:
+    ami: ami-0ca5998dc2c88e64b
+
 hubDefaults:
   kubespawner_override:
     node_affinity_required:
