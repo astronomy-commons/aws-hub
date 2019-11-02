@@ -4,6 +4,18 @@ A JupyterHub on Kubernetes gateway to EC2 instances on AWS
 This repository contains a Helm chart in `aws-hub` and a Python module in `aws_hub`.
 
 # Installation
+Requires `python3`! Install dependencies either with
+```
+python -m pip install -r requirements.txt
+```
+or use a python virtual environment:
+```
+python3 -m venv my-env
+source my-env/bin/activate
+python -m pip install -r requirements.txt
+```
+
+Set up your environment so you can use the scripts:
 ```
 git clone git@github.com:dirac-institute/aws-hub.git
 cd aws-hub
