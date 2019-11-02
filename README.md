@@ -41,3 +41,7 @@ printf "jupyterhub:\n  proxy:\n    secretToken: $(openssl rand -hex 32)\n" >> se
 # install the aws-hub helm chart (based on JupyterHub) with the instance profiles and the generated secret
 helm upgrade --install aws-hub aws-hub --namespace aws-hub --values profiles.yaml --values secret.yaml
 ```
+
+# Limitations
+
+It is not actually practical to create an Auto Scaling Group (ASG) for each instance type in a region duplicated across availability zones and with both on-demand and spot pricing. Running the example included here will create 986 distince ASGs on your account. AWS sets default limits on the number of ASGs to 200. Additionally, the number of inbound / outbound rules for security groups is limited to 60 by default. `eksctl` will create a security group for Kubernetes control plane communication which will have 1 inbound and 2 outbound rules per `eksctl` generated nodegroup. Since AWS sets a default limit of 60 rules / security group this effectively limits the number of ASGs to 20. Increasing this limit to the maximum of 1000 still limits the number of ASGs to 333. A workaround to this could include placing all nodes into the same security group so only 1 rule needs to be made for control plane communication between all nodes. 
