@@ -82,6 +82,11 @@ groups:
   separateAvailabilityZones: true
   separateInstances: true
   separateFamilies: true
+  nodegroupOverrides:
+    labels: 
+      dirac.washington.edu/instance-name: "{instance_name}-spot"
+    tags:
+      k8s.io/cluster-autoscaler/node-template/label/dirac.washington.edu/instance-name: "{instance_name}-spot"
 # GPU nodes require a different AMI
 - families:
   - "p3"
@@ -108,6 +113,10 @@ groups:
   separateFamilies: true
   nodegroupOverrides:
     ami: ami-0ca5998dc2c88e64b
+    labels: 
+      dirac.washington.edu/instance-name: "{instance_name}-spot"
+    tags:
+      k8s.io/cluster-autoscaler/node-template/label/dirac.washington.edu/instance-name: "{instance_name}-spot"
 
 hubDefaults:
   kubespawner_override:
