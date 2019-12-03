@@ -72,6 +72,7 @@ def make_profile_list(instance_information):
         cpu_limit = float(cpu_str)
         cpu_undershoot_ratio = 0.9
         cpu_guarantee = float("{:.1f}".format(float(cpu_str) * cpu_undershoot_ratio))
+        cpu_guarantee = float("{:.1f}".format(cpu_limit - 0.5))
         mem_gib = mem_str.split(" ")[0].replace(",", "")
         # GiB = 2^30 bytes, GB = 10^9 bytes
         gib_to_gb = 1e9 / (2**30)
@@ -83,10 +84,13 @@ def make_profile_list(instance_information):
         kubespawner_override['cpu_guarantee'] = cpu_guarantee
         kubespawner_override['mem_limit'] = mem_limit
         kubespawner_override['mem_guarantee'] = mem_guarantee
+        extra_resource_limits = {}
         if gpu:
-            extra_resource_limits = {}
             extra_resource_limits['nvidia.com/gpu'] = gpu
-            kubespawner_override['extra_resource_limits'] = extra_resource_limits
+        else:
+            extra_resource_limits['nvidia.com/gpu'] = '0'
+        kubespawner_override['extra_resource_limits'] = extra_resource_limits
+
         profile['kubespawner_override'] = kubespawner_override
 
         profile_list.append(profile)
